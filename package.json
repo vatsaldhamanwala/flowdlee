@@ -1,0 +1,24 @@
+{
+  "name": "flowdlee",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Flowdlee is a calm AI-ready workday planner and smart break reminder platform for IT professionals.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "flowdlee",
+    "productivity",
+    "workday-planner",
+    "focus",
+    "break-reminder",
+    "nextjs",
+    "monorepo",
+    "ai-planner"
+  ],
+  "author": "Vatsal Dhamanwala",
+  "license": "MIT",
+  "packageManager": "pnpm@11.9.0",
+  "type": "module"
+}
