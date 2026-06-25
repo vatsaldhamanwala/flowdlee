@@ -5,7 +5,8 @@
   "description": "Flowdlee is a calm AI-ready workday planner and smart break reminder platform for IT professionals.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write ."
   },
   "keywords": [
     "flowdlee",
@@ -20,5 +21,9 @@
   "author": "Vatsal Dhamanwala",
   "license": "MIT",
   "packageManager": "pnpm@11.9.0",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "prettier": "^3.8.4",
+    "prettier-plugin-tailwindcss": "^0.8.0"
+  }
 }

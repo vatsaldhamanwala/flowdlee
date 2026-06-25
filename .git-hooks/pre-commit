@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Color codes for pretty terminal outputs
+RED="\033[1;31m"
+GREEN="\033[1;32m"
+NC="\033[0m"
+
+# Get all staged JS, JSX, TS, and TSX files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|jsx|ts|tsx)$')
+
+# If no relevant files are staged, exit early and skip linting/formatting
+if [ -z "$STAGED_FILES" ]; then
+  echo "${GREEN}No JavaScript or TypeScript files staged. Skipping pre-commit checks! 🎉${NC}"
+  exit 0
+fi
+
+echo "Running Linter.. ⚒️⚒️⚒️"
+# --no-error-on-unmatched-pattern prevents ESLint v9 from crashing if a file pattern doesn't match config rules
+pnpm exec eslint $STAGED_FILES --quiet --fix --max-warnings 0 --no-error-on-unmatched-pattern
+LINTER_EXIT_CODE=$?
+
+echo "Running Prettier.. ✨✨✨"
+# --ignore-unknown ensures Prettier ignores files it doesn't know how to parse
+pnpm exec prettier $STAGED_FILES --ignore-unknown --write
+
+# Automatically re-stage files that were modified/fixed by ESLint and Prettier
+git add $STAGED_FILES
+
+# Check the final linter exit code
+if [ $LINTER_EXIT_CODE -ne 0 ]
+then
+  echo "\n${RED}❌ Linter errors have occurred ( ͡ಥ ͜ʖ ͡ಥ)${NC}"
+  echo "Showing full ESLint output below:\n"
+  # Run it again without --quiet so the developer can see the errors/warnings
+  pnpm exec eslint $STAGED_FILES --fix --max-warnings 0 --no-error-on-unmatched-pattern
+  exit 1
+else
+  echo "\n${GREEN}✔ ESLint and Prettier passed successfully! [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]${NC}"
+  echo "🎉 You are a rockstar.. 🔥🔥🔥\n"
+  exit 0
+fi
