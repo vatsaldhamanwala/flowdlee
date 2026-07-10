@@ -22,6 +22,8 @@ export async function findUserByEmail(email: string) {
     },
   });
 
+  if (!userExist) throw new ApiError(404, USER.NOT_FOUND);
+
   return userExist;
 }
 
