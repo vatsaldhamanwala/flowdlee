@@ -1,6 +1,7 @@
 import { APP } from '@/constants/api-response-error-messages';
 import { appConfig } from '@/server/config/app.config';
 import { successResponse } from '@/server/helpers/api-response';
+import { StatusCodes } from 'http-status-codes/build/cjs/status-codes';
 
 export async function GET() {
   return successResponse(
@@ -11,5 +12,6 @@ export async function GET() {
       uptime: process.uptime(),
     },
     APP.RUNNING,
+    StatusCodes.OK,
   );
 }

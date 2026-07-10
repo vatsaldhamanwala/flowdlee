@@ -5,6 +5,7 @@ export function successResponse<T>(data: T, message = 'Success', status = 200) {
   const response: ApiResponse<T> = {
     success: true,
     message,
+    status,
     data,
     error: null,
     timestamp: new Date().toISOString(),
@@ -17,6 +18,7 @@ export function errorResponse(message = 'Something went wrong', status = 500, er
   const response: ApiResponse<null> = {
     success: false,
     message,
+    status,
     data: null,
     error,
     timestamp: new Date().toISOString(),

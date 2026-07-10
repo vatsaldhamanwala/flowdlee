@@ -2,6 +2,7 @@ import { USER } from '@/constants/api-response-error-messages';
 import { prisma } from '@/server/db/prisma';
 import { ApiError } from 'next/dist/server/api-utils';
 import { updateUserProfileInput } from './validators/user.schema';
+import { StatusCodes } from 'http-status-codes';
 
 export async function findUserById(userId: string) {
   const userExist = await prisma.user.findUnique({
@@ -10,7 +11,7 @@ export async function findUserById(userId: string) {
     },
   });
 
-  if (!userExist) throw new ApiError(404, USER.NOT_FOUND);
+  if (!userExist) throw new ApiError(StatusCodes.NOT_FOUND, USER.NOT_FOUND);
 
   return userExist;
 }
@@ -22,7 +23,7 @@ export async function findUserByEmail(email: string) {
     },
   });
 
-  if (!userExist) throw new ApiError(404, USER.NOT_FOUND);
+  if (!userExist) throw new ApiError(StatusCodes.NOT_FOUND, USER.NOT_FOUND);
 
   return userExist;
 }
@@ -30,7 +31,7 @@ export async function findUserByEmail(email: string) {
 export async function updateProfile(userId: string, data: updateUserProfileInput) {
   const userExist = await findUserById(userId);
 
-  if (!userExist) throw new ApiError(404, USER.NOT_FOUND);
+  if (!userExist) throw new ApiError(StatusCodes.NOT_FOUND, USER.NOT_FOUND);
 
   const updatedUserData = await prisma.user.update({
     where: {
