@@ -82,7 +82,7 @@ flowdlee/
 
 ## Current Status
 
-Day 1 setup in progress.
+Day 6 setup in progress.
 
 ## Roadmap
 
