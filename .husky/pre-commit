@@ -6,7 +6,7 @@ GREEN="\033[1;32m"
 NC="\033[0m"
 
 # Get all staged JS, JSX, TS, and TSX files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|jsx|ts|tsx)$')
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(js|jsx|ts|tsx)$' || true)
 
 # If no relevant files are staged, exit early and skip linting/formatting
 if [ -z "$STAGED_FILES" ]; then
