@@ -1,4 +1,4 @@
-import { ApiError } from 'next/dist/server/api-utils';
+import { ApiError } from '@/server/helpers/api-error';
 import { UserRepository } from '../users/user.repository';
 import { UserLoginInput, UserRegisterInput } from './validators/auth.schema';
 import { StatusCodes } from 'http-status-codes';
@@ -28,18 +28,25 @@ export class AuthService {
     return toUserResponseDTO(newUser);
   }
 
-  // login user
-  async loginUser(data: UserLoginInput): Promise<UserLoginDTO> {
+  // authenticate user
+  async authenticateUser(data: UserLoginInput) {
     const userExist = await this.userRepository.findUserByEmail(data.email);
 
     if (!userExist || !userExist.passwordHash) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, USER.INVALID_CREDENTIALS);
+      throw new ApiError(StatusCodes.BAD_REQUEST, USER.INVALID_CREDENTIALS_OR_USER_NOT_FOUND);
     }
 
     // verify password
     const isPasswordValid = await verifyPassword(data.password, userExist.passwordHash);
 
     if (!isPasswordValid) throw new ApiError(StatusCodes.UNAUTHORIZED, USER.INVALID_CREDENTIALS);
+
+    return userExist;
+  }
+
+  // login user
+  async loginUser(data: UserLoginInput): Promise<UserLoginDTO> {
+    const userExist = await this.authenticateUser(data);
 
     return toUserResponseDTO(userExist);
   }

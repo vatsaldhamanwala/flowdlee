@@ -21,5 +21,6 @@ export const USER = {
   DELETED: 'User deleted successfully',
   EMAIL_ALREADY_EXISTS: 'User with this email is already exists',
   INVALID_CREDENTIALS: 'Invalid email or password',
+  INVALID_CREDENTIALS_OR_USER_NOT_FOUND: 'Invalid credentials or user not found',
   LOGIN: 'You are logged in successfully into Flowdlee',
 };

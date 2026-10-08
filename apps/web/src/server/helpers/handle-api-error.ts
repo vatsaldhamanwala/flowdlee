@@ -1,12 +1,17 @@
 import { ZodError } from 'zod';
 import { errorResponse } from './api-response';
 import { ERROR, VALIDATION } from '@/constants/api-response-error-messages';
-import { ApiError } from 'next/dist/server/api-utils';
+import { ApiError } from './api-error';
+import { ValidationError } from './validation-error';
 import { StatusCodes } from 'http-status-codes/build/cjs/status-codes';
 
 export function handleApiError(error: unknown) {
   if (error instanceof ZodError) {
     return errorResponse(VALIDATION.FAILED, StatusCodes.BAD_REQUEST, error.issues.map((issue) => issue.message).join(', '));
+  }
+
+  if (error instanceof ValidationError) {
+    return errorResponse(error.message, error.statusCode, error.stack || null);
   }
 
   if (error instanceof ApiError) {
