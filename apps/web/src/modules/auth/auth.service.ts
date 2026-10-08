@@ -33,7 +33,7 @@ export class AuthService {
     const userExist = await this.userRepository.findUserByEmail(data.email);
 
     if (!userExist || !userExist.passwordHash) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, USER.INVALID_CREDENTIALS_OR_USER_NOT_FOUND);
+      throw new ApiError(StatusCodes.UNAUTHORIZED, USER.INVALID_CREDENTIALS_OR_USER_NOT_FOUND);
     }
 
     // verify password

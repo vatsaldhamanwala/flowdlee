@@ -57,8 +57,8 @@ export function LoginForm() {
 
       router.push('/dashboard');
       router.refresh();
-    } catch (error) {
-      setFormError('Something went wrong. Please try again.' + error);
+    } catch {
+      setFormError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
