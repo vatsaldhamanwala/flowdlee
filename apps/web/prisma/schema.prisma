@@ -7,6 +7,12 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AuthProvider {
+  CREDENTIALS
+  GOOGLE
+  GITHUB
+}
+
 enum WorkMode {
   REMOTE
   OFFICE
@@ -94,20 +100,21 @@ enum ThemePreference {
 }
 
 model User {
-  id                  String   @id @default(cuid())
-  name                String?
-  email               String   @unique
-  passwordHash        String?
+  id                  String       @id @default(uuid(7)) @db.Uuid
+  name                String
+  email               String       @unique
+  passwordHash        String
   avatarUrl           String?
-  isEmailVerified     Boolean  @default(false)
-  onboardingCompleted Boolean  @default(false)
+  authProvider        AuthProvider @default(CREDENTIALS)
+  isEmailVerified     Boolean      @default(false)
+  onboardingCompleted Boolean      @default(false)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
 
-  // Auth.js Relations
-  accounts            Account[]
-  sessions            Session[]
-
-  // Flowdlee Relations
+  // Auth relations
   refreshTokens       RefreshToken[]
+
+  // Flowdlee relations
   onboardingResponse  OnboardingResponse?
   preferences         UserPreference?
   dailyPlans          DailyPlan[]
@@ -117,53 +124,13 @@ model User {
   notifications       Notification[]
   dailyAnalytics      DailyAnalytics[]
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
   @@map("users")
 }
 
-model Account {
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-
-  refresh_token String?
-  access_token  String?
-  expires_at    Int?
-  token_type    String?
-  scope         String?
-  id_token      String?
-  session_state String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([provider, providerAccountId])
-}
-
-model Session {
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([sessionToken])
-}
-
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@id([identifier, token])
-}
-
 model RefreshToken {
-  id        String    @id @default(cuid())
-  userId    String
-  tokenHash String
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique
   expiresAt DateTime
   revokedAt DateTime?
   createdAt DateTime  @default(now())
@@ -175,8 +142,8 @@ model RefreshToken {
 }
 
 model OnboardingResponse {
-  id                     String   @id @default(cuid())
-  userId                 String   @unique
+  id                     String    @id @default(uuid(7)) @db.Uuid
+  userId                 String    @unique @db.Uuid
   workMode               WorkMode
   workStyle              WorkStyle
   wellnessGoals          String[]
@@ -186,17 +153,17 @@ model OnboardingResponse {
   workStartTime          String
   workEndTime            String
   timezone               String
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
-  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("onboarding_responses")
 }
 
 model UserPreference {
-  id                        String          @id @default(cuid())
-  userId                    String          @unique
+  id                        String          @id @default(uuid(7)) @db.Uuid
+  userId                    String          @unique @db.Uuid
   workMode                  WorkMode
   workStartTime             String
   workEndTime               String
@@ -221,8 +188,8 @@ model UserPreference {
 }
 
 model DailyPlan {
-  id                    String          @id @default(cuid())
-  userId                String
+  id                    String          @id @default(uuid(7)) @db.Uuid
+  userId                String          @db.Uuid
   planDate              DateTime
   status                DailyPlanStatus @default(PLANNED)
   totalPlannedMinutes   Int             @default(0)
@@ -241,24 +208,24 @@ model DailyPlan {
 }
 
 model Task {
-  id               String       @id @default(cuid())
-  userId           String
-  dailyPlanId      String?
+  id               String         @id @default(uuid(7)) @db.Uuid
+  userId           String         @db.Uuid
+  dailyPlanId      String?        @db.Uuid
   title            String
   description      String?
-  priority         TaskPriority @default(MEDIUM)
+  priority         TaskPriority   @default(MEDIUM)
   category         String?
   estimatedMinutes Int?
   actualMinutes    Int?
   dueTime          DateTime?
-  status           TaskStatus   @default(PENDING)
-  sortOrder        Int          @default(0)
-  useForAiPlanning Boolean      @default(true)
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  status           TaskStatus     @default(PENDING)
+  sortOrder        Int            @default(0)
+  useForAiPlanning Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
-  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  dailyPlan        DailyPlan?   @relation(fields: [dailyPlanId], references: [id], onDelete: SetNull)
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyPlan        DailyPlan?     @relation(fields: [dailyPlanId], references: [id], onDelete: SetNull)
   focusSessions    FocusSession[]
 
   @@index([userId])
@@ -268,10 +235,10 @@ model Task {
 }
 
 model FocusSession {
-  id                     String             @id @default(cuid())
-  userId                 String
-  taskId                 String?
-  dailyPlanId            String?
+  id                     String             @id @default(uuid(7)) @db.Uuid
+  userId                 String             @db.Uuid
+  taskId                 String?            @db.Uuid
+  dailyPlanId            String?            @db.Uuid
   startedAt              DateTime           @default(now())
   endedAt                DateTime?
   pausedAt               DateTime?
@@ -298,9 +265,9 @@ model FocusSession {
 }
 
 model BreakSession {
-  id                     String             @id @default(cuid())
-  userId                 String
-  focusSessionId         String?
+  id                     String             @id @default(uuid(7)) @db.Uuid
+  userId                 String             @db.Uuid
+  focusSessionId         String?            @db.Uuid
   breakType              BreakType
   startedAt              DateTime?
   endedAt                DateTime?
@@ -321,8 +288,8 @@ model BreakSession {
 }
 
 model Notification {
-  id          String             @id @default(cuid())
-  userId      String
+  id          String             @id @default(uuid(7)) @db.Uuid
+  userId      String             @db.Uuid
   type        NotificationType
   title       String
   message     String
@@ -342,8 +309,8 @@ model Notification {
 }
 
 model DailyAnalytics {
-  id                         String   @id @default(cuid())
-  userId                     String
+  id                         String   @id @default(uuid(7)) @db.Uuid
+  userId                     String   @db.Uuid
   date                       DateTime
   totalFocusMinutes          Int      @default(0)
   totalBreakMinutes          Int      @default(0)

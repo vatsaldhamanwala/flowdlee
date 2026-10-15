@@ -20,6 +20,6 @@ export const USER = {
   UPDATED: 'User updated successfully',
   DELETED: 'User deleted successfully',
   EMAIL_ALREADY_EXISTS: 'User with this email is already exists',
-  INVALID_CREDENTIALS: 'Invalid email or password',
-  LOGIN: 'You are logged in successfully into Flowdlee',
+  INVALID_CREDENTIALS: 'Unauthorized, Invalid email or password',
+  LOGIN_SUCCESS: 'Welcome! you are logged in successfully into Flowdlee',
 };

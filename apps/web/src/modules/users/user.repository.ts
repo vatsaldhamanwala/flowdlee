@@ -1,8 +1,14 @@
 import { Prisma, PrismaClient } from '@/generated/prisma';
-import { prisma } from '@/server/db/prisma';
 
 export class UserRepository {
   constructor(private readonly prisma: PrismaClient) {}
+
+  // create new user
+  async createUser(data: Prisma.UserCreateInput) {
+    return await this.prisma.user.create({
+      data,
+    });
+  }
 
   // find user by email
   async findUserByEmail(email: string) {
@@ -12,6 +18,7 @@ export class UserRepository {
       },
     });
   }
+
   // find user by id
   async findUserById(id: string) {
     return await this.prisma.user.findUnique({
@@ -20,12 +27,7 @@ export class UserRepository {
       },
     });
   }
-  // create new user
-  async createUser(data: Prisma.UserCreateInput) {
-    return await this.prisma.user.create({
-      data,
-    });
-  }
+
   //update user
   async updateUser(id: string, data: Prisma.UserUpdateInput) {
     return await this.prisma.user.update({
