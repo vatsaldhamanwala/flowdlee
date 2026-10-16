@@ -15,8 +15,10 @@ export class AuthRepository {
   }
 
   // revoke refresh token
-  async revokeRefreshToken(id: string) {
-    return this.prisma.refreshToken.update({ where: { id }, data: { revokedAt: new Date() } });
+  async revokeRefreshToken(id: string): Promise<boolean> {
+    const result = await this.prisma.refreshToken.updateMany({ where: { id, revokedAt: null }, data: { revokedAt: new Date() } });
+
+    return result.count === 1;
   }
 
   // revoke all user tokens

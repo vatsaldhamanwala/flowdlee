@@ -22,4 +22,10 @@ export const USER = {
   EMAIL_ALREADY_EXISTS: 'User with this email is already exists',
   INVALID_CREDENTIALS: 'Unauthorized, Invalid email or password',
   LOGIN_SUCCESS: 'Welcome! you are logged in successfully into Flowdlee',
+  LOGOUT_SUCCESS: 'Logged out successfully',
+};
+
+export const TOKEN = {
+  INVALID_REFRESH_TOKEN: 'Invalid or expired refresh token',
+  REFRESH_SUCCESS: 'Token refreshed successfully',
 };

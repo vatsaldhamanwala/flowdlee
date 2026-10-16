@@ -2,7 +2,7 @@ import { ApiError } from '@/server/helpers/api-error';
 import { UserRepository } from '../users/user.repository';
 import { UserLoginInput, UserRegisterInput } from './validators/auth.schema';
 import { StatusCodes } from 'http-status-codes';
-import { USER } from '@/constants/api-response-error-messages';
+import { TOKEN, USER } from '@/constants/api-response-error-messages';
 import { toUserResponseDTO, UserResponseDTO } from '../users';
 import { hashPassword, verifyPassword } from './auth.password';
 import { Prisma } from '@/generated/prisma';
@@ -79,10 +79,6 @@ export class AuthService {
     return userExist;
   }
 
-  // rotate refresh token
-  // revoke refresh token
-  // hash token
-
   // login user
   async loginUser(data: UserLoginInput) {
     const userExist = await this.authenticate(data.email, data.password);
@@ -92,5 +88,53 @@ export class AuthService {
     return { user: toUserResponseDTO(userExist), ...token };
   }
 
+  private unauthorized() {
+    return new ApiError(StatusCodes.UNAUTHORIZED, TOKEN.INVALID_REFRESH_TOKEN);
+  }
+
+  // refresh session
+  async refreshSession(rawRefreshToken: string) {
+    // find refresh token by hash
+    const hashRefreshTokenExist = await this.authRepository.findRefreshTokenByHash(hashToken(rawRefreshToken));
+
+    // if not throw error
+    if (!hashRefreshTokenExist) throw this.unauthorized();
+
+    // check already used or revoked refresh token
+    if (hashRefreshTokenExist.revokedAt) {
+      await this.authRepository.revokeAllUserTokens(hashRefreshTokenExist.id);
+
+      throw this.unauthorized();
+    }
+
+    // check if the token expired date is surpassed or old
+    if (hashRefreshTokenExist.expiresAt <= new Date()) throw this.unauthorized();
+
+    // find the rotation of outcome -> only one request can win
+    const wasRefreshTokenRevoked = await this.authRepository.revokeRefreshToken(hashRefreshTokenExist.id);
+
+    // if not won -> throw error
+    if (!wasRefreshTokenRevoked) {
+      await this.authRepository.revokeAllUserTokens(hashRefreshTokenExist.userId);
+
+      throw this.unauthorized();
+    }
+
+    // if the request made and was revoked refresh token successfully with one request than issue the new token to user
+    return this.issueTokens(hashRefreshTokenExist.userId);
+  }
+
   //logout user
+  async logoutUser(rawRefreshToken?: string) {
+    // check if rawRefreshToken is there -> if yes than return and log out the user directly
+    if (!rawRefreshToken) return;
+
+    // find refresh token by hash
+    const hashRefreshTokenExist = await this.authRepository.findRefreshTokenByHash(hashToken(rawRefreshToken));
+
+    // if refresh token by hash found and it is not revoked than -> revoked refresh token
+    if (hashRefreshTokenExist && !hashRefreshTokenExist.revokedAt) {
+      await this.authRepository.revokeRefreshToken(hashRefreshTokenExist.id);
+    }
+  }
 }
