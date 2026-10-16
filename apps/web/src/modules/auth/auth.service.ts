@@ -124,6 +124,16 @@ export class AuthService {
     return this.issueTokens(hashRefreshTokenExist.userId);
   }
 
+  // get current user
+  async getCurrentUser(userId: string) {
+    const userExist = await this.userRepository.findUserById(userId);
+
+    // token was valid but the account no longer exists
+    if (!userExist) throw new ApiError(StatusCodes.UNAUTHORIZED, USER.UNAUTHORIZED);
+
+    return toUserResponseDTO(userExist);
+  }
+
   //logout user
   async logoutUser(rawRefreshToken?: string) {
     // check if rawRefreshToken is there -> if yes than return and log out the user directly

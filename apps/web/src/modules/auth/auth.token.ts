@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { SignJWT } from 'jose';
+import { jwtVerify, SignJWT } from 'jose';
 import { AUTH } from '@/constants/auth.constants';
 
 function getAccessSecret(): Uint8Array {
@@ -28,4 +28,16 @@ export function generateRefreshToken(): string {
 // Only this hash is stored in the database, never the raw token.
 export function hashToken(raw: string): string {
   return createHash('sha256').update(raw).digest('hex');
+}
+
+// verify token
+export async function verifyAccessToken(token: string): Promise<string> {
+  const { payload } = await jwtVerify(token, getAccessSecret(), {
+    algorithms: ['HS256'],
+    issuer: 'flowdlee',
+  });
+
+  if (!payload.sub) throw new Error('Token has no subject');
+
+  return payload.sub;
 }

@@ -23,6 +23,8 @@ export const USER = {
   INVALID_CREDENTIALS: 'Unauthorized, Invalid email or password',
   LOGIN_SUCCESS: 'Welcome! you are logged in successfully into Flowdlee',
   LOGOUT_SUCCESS: 'Logged out successfully',
+  UNAUTHORIZED: 'Authentication required',
+  FETCHED: 'Current user fetch successfully',
 };
 
 export const TOKEN = {
