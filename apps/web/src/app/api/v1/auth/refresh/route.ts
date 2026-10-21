@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     const refreshSessionTokens = await authService.refreshSession(token);
 
-    const response = successResponse({ data: source === 'body' ? refreshSessionTokens : null });
+    const response = successResponse(source === 'body' ? refreshSessionTokens : null);
 
     setAuthCookies(response, refreshSessionTokens);
 

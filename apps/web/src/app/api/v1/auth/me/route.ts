@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     const userExist = await authService.getCurrentUser(userId);
 
-    return successResponse({ data: userExist }, USER.FETCHED, StatusCodes.OK);
+    return successResponse(userExist, USER.FETCHED, StatusCodes.OK);
   } catch (error) {
     return handleApiError(error);
   }

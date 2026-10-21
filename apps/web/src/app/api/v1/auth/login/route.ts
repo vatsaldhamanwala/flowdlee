@@ -15,11 +15,7 @@ export async function POST(request: Request) {
     // Tokens go in the body only for non-browser clients that option (mobile version)
     const wantsTokenInBody = request.headers.get('x-client-type') === 'mobile';
 
-    const response = successResponse({
-      data: wantsTokenInBody ? { user, accessToken, refreshToken } : { user },
-      message: USER.LOGIN_SUCCESS,
-      status: StatusCodes.OK,
-    });
+    const response = successResponse(wantsTokenInBody ? { user, accessToken, refreshToken } : { user }, USER.LOGIN_SUCCESS, StatusCodes.OK);
 
     setAuthCookies(response, { accessToken, refreshToken });
 

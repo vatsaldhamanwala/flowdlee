@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
     await authService.logoutUser(token);
 
-    const response = successResponse({ data: null, message: USER.LOGOUT_SUCCESS, status: StatusCodes.OK });
+    const response = successResponse(null, USER.LOGOUT_SUCCESS, StatusCodes.OK);
 
     clearAuthCookies(response);
 

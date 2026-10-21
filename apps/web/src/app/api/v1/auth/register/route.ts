@@ -12,11 +12,7 @@ export async function POST(request: Request) {
 
     const user = await authService.registerUser(input);
 
-    return successResponse({
-      data: user,
-      message: USER.ACCOUNT_CREATED,
-      status: StatusCodes.CREATED,
-    });
+    return successResponse(user, USER.ACCOUNT_CREATED, StatusCodes.CREATED);
   } catch (error) {
     return handleApiError(error);
   }
