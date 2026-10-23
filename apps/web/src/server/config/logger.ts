@@ -1,3 +1,5 @@
+import { env } from '../config/env';
+
 type logLevel = 'info' | 'warn' | 'error' | 'debug';
 
 const formatLog = (level: logLevel, message: string, context?: unknown) => {
@@ -22,7 +24,7 @@ export const logger = {
   },
 
   debug: (message: string, context?: unknown) => {
-    if (process.env.NODE_ENV !== 'production') {
+    if (env.NODE_ENV !== 'production') {
       console.log(`\x1b[36m${formatLog('debug', message, context)}\x1b[0m`); // Cyan text
     }
   },

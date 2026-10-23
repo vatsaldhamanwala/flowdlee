@@ -1,21 +1,22 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@/generated/prisma';
+import { env } from '../config/env';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   prismaAdapter: PrismaPg | undefined;
 };
 
-const adapter = globalForPrisma.prismaAdapter ?? new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const adapter = globalForPrisma.prismaAdapter ?? new PrismaPg({ connectionString: env.DATABASE_URL });
 
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    log: env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
 
-if (process.env.NODE_ENV !== 'production') {
+if (env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
   globalForPrisma.prismaAdapter = adapter;
 }

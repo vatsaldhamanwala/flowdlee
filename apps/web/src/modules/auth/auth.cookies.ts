@@ -1,9 +1,10 @@
 import { AUTH } from '@/constants/auth.constants';
+import { env } from '@/server/config/env';
 import { NextRequest, NextResponse } from 'next/server';
 
 const baseCookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
+  secure: env.NODE_ENV === 'production',
   sameSite: 'lax' as const,
 };
 

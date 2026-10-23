@@ -1,5 +1,7 @@
+import { env } from './env';
+
 export const appConfig = {
-  name: process.env.NEXT_PUBLIC_APP_NAME || 'Flowdlee',
-  url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-  env: process.env.NODE_ENV || 'development',
+  name: env.NEXT_PUBLIC_APP_NAME,
+  url: env.NEXT_PUBLIC_APP_URL,
+  env: env.NODE_ENV,
 };

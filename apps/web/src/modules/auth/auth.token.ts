@@ -1,9 +1,10 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { jwtVerify, SignJWT } from 'jose';
 import { AUTH } from '@/constants/auth.constants';
+import { env } from '@/server/config/env';
 
 function getAccessSecret(): Uint8Array {
-  const secret = process.env.JWT_ACCESS_SECRET;
+  const secret = env.JWT_ACCESS_SECRET;
   if (!secret || secret.length < 32) {
     throw new Error('JWT_ACCESS_SECRET must be set and at least 32 characters');
   }

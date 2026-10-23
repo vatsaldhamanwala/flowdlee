@@ -10,7 +10,6 @@ const envSchema = z.object({
 
   // Authentication
   JWT_ACCESS_SECRET: z.string().min(32, 'Access secret should be at least 32 characters for security'),
-  JWT_REFRESH_SECRET: z.string().min(32, 'Refresh secret should be at least 32 characters for security'),
 
   // Third-Party Services (Optional for now so the app boots without them)
 

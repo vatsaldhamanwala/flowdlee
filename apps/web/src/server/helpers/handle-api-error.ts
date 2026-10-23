@@ -1,39 +1,13 @@
-// import { ZodError } from 'zod';
-// import { errorResponse } from './api-response';
-// import { ERROR, VALIDATION } from '@/constants/api-response-error-messages';
-// import { ApiError } from './api-error';
-// import { StatusCodes } from 'http-status-codes/build/cjs/status-codes';
-// import { ValidationError } from './validation-error';
-
-// export function handleApiError(error: unknown) {
-//   if (error instanceof ZodError) {
-//     return errorResponse(VALIDATION.FAILED, StatusCodes.BAD_REQUEST, error.issues.map((issue) => issue.message).join(', '));
-//   }
-
-//   if (error instanceof ValidationError) {
-//     return errorResponse(error.message, error.statusCode, error.stack || null);
-//   }
-
-//   if (error instanceof ApiError) {
-//     return errorResponse(error.message, error.statusCode, error.stack || null);
-//   }
-
-//   if (error instanceof Error) {
-//     return errorResponse(error.message || ERROR.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR, error.stack || null);
-//   }
-
-//   return errorResponse(ERROR.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR, 'Unknown error occurred');
-// }
-
 import { ZodError } from 'zod';
 import { StatusCodes } from 'http-status-codes';
 import { errorResponse } from './api-response';
 import { ERROR, VALIDATION } from '@/constants/api-response-error-messages';
 import { ApiError } from './api-error';
 import { ValidationError } from './validation-error';
+import { env } from '../config/env';
 
 // Stack traces are only for local debugging, never for real clients.
-const stackInDev = (error: Error) => (process.env.NODE_ENV === 'development' ? (error.stack ?? null) : null);
+const stackInDev = (error: Error) => (env.NODE_ENV === 'development' ? (error.stack ?? null) : null);
 
 export function handleApiError(error: unknown) {
   if (error instanceof ZodError) {
