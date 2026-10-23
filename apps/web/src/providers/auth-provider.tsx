@@ -30,8 +30,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserResponseDTO | null>(null);
   const [status, setStatus] = useState<Status>('loading');
 
-  console.log('auth: ', status, user);
-
   // when app open first , ask who am I ?
 
   useEffect(() => {
