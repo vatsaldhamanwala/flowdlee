@@ -1,10 +1,11 @@
-import { Prisma, PrismaClient } from '@/generated/prisma';
+import { PrismaClient } from '@/generated/prisma';
+import { CreateUserInputDTO, UpdateUserInputDTO } from './dto/user.dto';
 
 export class UserRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   // create new user
-  async createUser(data: Prisma.UserCreateInput) {
+  async createUser(data: CreateUserInputDTO) {
     return await this.prisma.user.create({
       data,
     });
@@ -29,7 +30,7 @@ export class UserRepository {
   }
 
   //update user
-  async updateUser(id: string, data: Prisma.UserUpdateInput) {
+  async updateUser(id: string, data: UpdateUserInputDTO) {
     return await this.prisma.user.update({
       where: {
         id,
