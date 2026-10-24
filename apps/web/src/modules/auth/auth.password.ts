@@ -13,6 +13,10 @@ export async function hashPassword(password: string): Promise<string> {
 }
 
 // verify a password against its stored hash
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return argon2.verify(hash, password);
+export async function verifyPassword(hash: string, password: string): Promise<boolean> {
+  try {
+    return argon2.verify(hash, password);
+  } catch {
+    return false; // malformed hash -> treat as failed match , never throw
+  }
 }
