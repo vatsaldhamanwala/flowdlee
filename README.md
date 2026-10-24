@@ -82,7 +82,7 @@ flowdlee/
 
 ## Current Status
 
-Day 13 in progress.
+working on Onboarding and Preferences module
 
 ## Roadmap
 
