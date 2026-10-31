@@ -1,17 +1,25 @@
 'use client';
 
+import { ArrowRight, CircleAlert, LoaderCircle, Lock, Mail, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ApiClientError } from '@/lib/api/client';
 import { userRegisterSchema } from '@/modules/auth/validators/auth.schema';
 import { useAuth } from '@/providers/auth-provider';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 type FieldErrors = {
   name?: string;
   email?: string;
   password?: string;
-  confirmPassword?: string;
+  terms?: string;
 };
+
+const iconClass = 'pointer-events-none absolute top-1/2 left-4 size-4.5 -translate-y-1/2 text-muted-foreground';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -21,76 +29,33 @@ export function RegisterForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   function validate() {
-    const result = userRegisterSchema.safeParse({
-      name,
-      email,
-      password,
-      confirmPassword,
-    });
+    const errors: FieldErrors = {};
 
+    const result = userRegisterSchema.safeParse({ name, email, password });
     if (!result.success) {
-      const errors: FieldErrors = {};
       for (const issue of result.error.issues) {
         const field = issue.path[0] as keyof FieldErrors;
         if (!errors[field]) errors[field] = issue.message;
       }
-      setFieldErrors(errors);
-      return false;
     }
 
-    setFieldErrors({});
-    return true;
+    // The terms box is checked only here in the browser. The server does not need it.
+    if (!agreed) {
+      errors.terms = 'Please accept the terms to continue.';
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   }
 
-  //   async function handleSubmit(e: React.FormEvent) {
-  //     e.preventDefault();
-  //     setFormError(null);
-
-  //     if (!validate()) return;
-
-  //     setIsLoading(true);
-  //     try {
-  //       const res = await fetch('/api/v1/auth/register', {
-  //         method: 'POST',
-  //         headers: { 'Content-Type': 'application/json' },
-  //         body: JSON.stringify({ name, email, password, confirmPassword }),
-  //       });
-
-  //       if (!res.ok) {
-  //         const data = await res.json().catch(() => null);
-  //         setFormError(data?.message ?? 'Registration failed. Please try again.');
-  //         return;
-  //       }
-
-  //       // Auto sign-in after successful registration
-  //       const signInResult = await signIn('credentials', {
-  //         email,
-  //         password,
-  //         redirect: false,
-  //       });
-
-  //       if (signInResult?.error) {
-  //         // Registered fine, but auto-login failed — send them to login instead
-  //         router.push('/login');
-  //         return;
-  //       }
-
-  //       router.push('/dashboard');
-  //       router.refresh();
-  //     } catch {
-  //       setFormError('Something went wrong. Please try again.');
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   }
-
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
     setFormError(null);
 
@@ -98,7 +63,7 @@ export function RegisterForm() {
 
     setIsLoading(true);
     try {
-      const { loggedIn } = await register({ name, email, password, confirmPassword }); // ← new line 1
+      const { loggedIn } = await register({ name, email, password });
       router.replace(loggedIn ? '/dashboard' : '/login');
     } catch (err) {
       if (err instanceof ApiClientError && err.details?.length) {
@@ -121,76 +86,140 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4" noValidate>
-      {formError && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{formError}</div>}
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
+      {formError && (
+        <div
+          role="alert"
+          className="border-destructive/30 bg-destructive-surface text-destructive flex items-start gap-3 rounded-lg border px-4 py-3 text-sm"
+        >
+          <CircleAlert className="mt-0.5 size-4.5 shrink-0" aria-hidden />
+          <span>{formError}</span>
+        </div>
+      )}
 
-      <div className="space-y-1">
-        <label htmlFor="name" className="text-sm font-medium">
-          Name
-        </label>
-        <input
-          id="name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={isLoading}
-          className={`w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50 ${fieldErrors.name ? 'border-red-400' : ''}`}
-          placeholder="Your name"
-        />
-        {fieldErrors.name && <p className="text-xs text-red-600">{fieldErrors.name}</p>}
+      {/* FULL NAME */}
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="name">Full name</Label>
+        <div className="relative">
+          <User aria-hidden className={iconClass} />
+          <Input
+            id="name"
+            type="text"
+            autoComplete="name"
+            placeholder="Alex Rivera"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={isLoading}
+            aria-invalid={!!fieldErrors.name}
+            aria-describedby={fieldErrors.name ? 'name-error' : undefined}
+            className="pl-11"
+          />
+        </div>
+        {fieldErrors.name && (
+          <p id="name-error" className="text-destructive text-sm">
+            {fieldErrors.name}
+          </p>
+        )}
       </div>
 
-      <div className="space-y-1">
-        <label htmlFor="email" className="text-sm font-medium">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={isLoading}
-          className={`w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50 ${fieldErrors.email ? 'border-red-400' : ''}`}
-          placeholder="you@example.com"
-        />
-        {fieldErrors.email && <p className="text-xs text-red-600">{fieldErrors.email}</p>}
+      {/* EMAIL */}
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="email">Email address</Label>
+        <div className="relative">
+          <Mail aria-hidden className={iconClass} />
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="name@company.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+            aria-invalid={!!fieldErrors.email}
+            aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+            className="pl-11"
+          />
+        </div>
+        {fieldErrors.email && (
+          <p id="email-error" className="text-destructive text-sm">
+            {fieldErrors.email}
+          </p>
+        )}
       </div>
 
-      <div className="space-y-1">
-        <label htmlFor="password" className="text-sm font-medium">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={isLoading}
-          className={`w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50 ${fieldErrors.password ? 'border-red-400' : ''}`}
-          placeholder="At least 8 characters"
-        />
-        {fieldErrors.password && <p className="text-xs text-red-600">{fieldErrors.password}</p>}
+      {/* PASSWORD with Show / Hide */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="password">Password</Label>
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-controls="password"
+            aria-pressed={showPassword}
+            className="text-primary focus-visible:ring-ring/50 rounded-sm text-sm font-semibold outline-none hover:underline focus-visible:ring-3"
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+        </div>
+        <div className="relative">
+          <Lock aria-hidden className={iconClass} />
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            placeholder="At least 8 characters"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            aria-invalid={!!fieldErrors.password}
+            aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+            className="pl-11"
+          />
+        </div>
+        {fieldErrors.password && (
+          <p id="password-error" className="text-destructive text-sm">
+            {fieldErrors.password}
+          </p>
+        )}
       </div>
 
-      <div className="space-y-1">
-        <label htmlFor="confirmPassword" className="text-sm font-medium">
-          Confirm Password
-        </label>
-        <input
-          id="confirmPassword"
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          disabled={isLoading}
-          className={`w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50 ${fieldErrors.confirmPassword ? 'border-red-400' : ''}`}
-          placeholder="••••••••"
-        />
-        {fieldErrors.confirmPassword && <p className="text-xs text-red-600">{fieldErrors.confirmPassword}</p>}
+      {/* TERMS */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-start gap-3">
+          <Checkbox
+            id="terms"
+            checked={agreed}
+            onCheckedChange={(value) => setAgreed(value === true)}
+            disabled={isLoading}
+            aria-invalid={!!fieldErrors.terms}
+            aria-describedby={fieldErrors.terms ? 'terms-error' : undefined}
+            className="mt-0.5"
+          />
+          {/* TODO: link "Terms" and "Privacy Policy" once those pages exist */}
+          <Label htmlFor="terms" className="text-muted-foreground leading-5.5 font-normal">
+            I agree to the Terms and Privacy Policy.
+          </Label>
+        </div>
+        {fieldErrors.terms && (
+          <p id="terms-error" className="text-destructive text-sm">
+            {fieldErrors.terms}
+          </p>
+        )}
       </div>
 
-      <button type="submit" disabled={isLoading} className="w-full rounded-md bg-black py-2 text-sm font-medium text-white disabled:opacity-50">
-        {isLoading ? 'Creating account...' : 'Create account'}
-      </button>
+      <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+        {isLoading ? (
+          <>
+            <LoaderCircle className="animate-spin" aria-hidden />
+            Creating account…
+          </>
+        ) : (
+          <>
+            Create account
+            <ArrowRight aria-hidden />
+          </>
+        )}
+      </Button>
     </form>
   );
 }

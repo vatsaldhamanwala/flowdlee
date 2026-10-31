@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#F7F8F4] text-[#1F2933]">
       <section className="mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 py-20 text-center">
-        <Badge className="mb-6 bg-[#F0EEFA] text-[#8B7CCB] hover:bg-[#F0EEFA]">AI-ready workday planner</Badge>
+        <Badge className="mb-6 bg-[#F0EEFA] text-[#8B7CCB] hover:bg-[#F0EEFA]">A calm workday planner</Badge>
 
         <h1 className="max-w-4xl text-5xl font-bold tracking-tight md:text-7xl">Plan your day. Protect your focus.</h1>
 

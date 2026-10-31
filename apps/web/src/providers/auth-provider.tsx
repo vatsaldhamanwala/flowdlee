@@ -13,7 +13,6 @@ interface Credentials {
 
 interface RegisterInput extends Credentials {
   name: string;
-  confirmPassword?: string;
 }
 
 interface AuthContextValue {
