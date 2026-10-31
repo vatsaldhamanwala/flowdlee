@@ -1,17 +1,22 @@
-export interface UserRegisterDTO {
-  id: string;
-  name: string | null;
+import { AuthProvider } from '@/generated/prisma';
+
+export interface CreateUserInputDTO {
+  name: string;
   email: string;
-  avatarUrl?: string | null;
-  onboardingCompleted: boolean;
-  createdAt: Date;
+  passwordHash: string;
 }
 
-export interface UserLoginDTO {
+export interface UpdateUserInputDTO {
+  name?: string;
+}
+
+export interface UserResponseDTO {
   id: string;
-  name: string | null;
+  name: string;
   email: string;
-  avatarUrl?: string | null;
+  avatarUrl: string | null;
+  authProvider: AuthProvider;
+  isEmailVerified: boolean;
   onboardingCompleted: boolean;
-  createdAt: Date;
+  createdAt: string;
 }
