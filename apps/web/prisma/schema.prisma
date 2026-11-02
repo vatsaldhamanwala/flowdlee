@@ -28,6 +28,40 @@ enum WorkStyle {
   MIXED
 }
 
+enum WellnessGoal {
+  EYE_COMFORT
+  BACK_POSTURE
+  STRESS_LEVEL
+  LONG_SITTING
+  FOCUS_CONSISTENCY
+  WORK_LIFE_BALANCE
+}
+
+enum BreakRhythm {
+  FOCUS_25
+  FOCUS_45
+  FOCUS_60
+  SMART
+  CUSTOM
+}
+
+enum ReminderStyle {
+  SILENT
+  BROWSER
+  SOUND_AND_BROWSER
+  FULLSCREEN_NUDGE
+}
+
+enum Weekday {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
+
 enum TaskPriority {
   LOW
   MEDIUM
@@ -142,21 +176,23 @@ model RefreshToken {
 }
 
 model OnboardingResponse {
-  id                     String    @id @default(uuid(7)) @db.Uuid
-  userId                 String    @unique @db.Uuid
-  workMode               WorkMode
-  workStyle              WorkStyle
-  wellnessGoals          String[]
-  breakPreference        String
-  notificationPreference String
-  workingDays            String[]
-  workStartTime          String
-  workEndTime            String
-  timezone               String
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  id                 String         @id @default(uuid(7)) @db.Uuid
+  userId             String         @unique @db.Uuid
+  workMode           WorkMode
+  workStartTime      String         @db.VarChar(5)
+  workEndTime        String         @db.VarChar(5)
+  workingDays        Weekday[]
+  timezone           String
+  workStyle          WorkStyle
+  wellnessGoals      WellnessGoal[] @default([])
+  breakRhythm        BreakRhythm
+  customFocusMinutes Int?
+  customBreakMinutes Int?
+  reminderStyle      ReminderStyle
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 
-  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("onboarding_responses")
 }
