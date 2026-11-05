@@ -102,7 +102,7 @@ export class AuthService {
 
     // check already used or revoked refresh token
     if (hashRefreshTokenExist.revokedAt) {
-      await this.authRepository.revokeAllUserTokens(hashRefreshTokenExist.id);
+      await this.authRepository.revokeAllUserTokens(hashRefreshTokenExist.userId);
 
       throw this.unauthorized();
     }

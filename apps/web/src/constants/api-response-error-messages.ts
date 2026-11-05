@@ -31,3 +31,8 @@ export const TOKEN = {
   INVALID_REFRESH_TOKEN: 'Invalid or expired refresh token',
   REFRESH_SUCCESS: 'Token refreshed successfully',
 };
+
+export const ONBOARDING_RESPONSE = {
+  FETCHED: 'Onboarding answers fetched successfully.',
+  SAVED: 'Onboarding answers saved successfully.',
+};
