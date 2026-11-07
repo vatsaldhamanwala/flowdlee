@@ -28,6 +28,40 @@ enum WorkStyle {
   MIXED
 }
 
+enum WellnessGoal {
+  EYE_COMFORT
+  BACK_POSTURE
+  STRESS_LEVEL
+  LONG_SITTING
+  FOCUS_CONSISTENCY
+  WORK_LIFE_BALANCE
+}
+
+enum BreakRhythm {
+  FOCUS_25
+  FOCUS_45
+  FOCUS_60
+  SMART
+  CUSTOM
+}
+
+enum ReminderStyle {
+  SILENT
+  BROWSER
+  SOUND_AND_BROWSER
+  FULLSCREEN_NUDGE
+}
+
+enum Weekday {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
+
 enum TaskPriority {
   LOW
   MEDIUM
@@ -108,8 +142,8 @@ model User {
   authProvider        AuthProvider @default(CREDENTIALS)
   isEmailVerified     Boolean      @default(false)
   onboardingCompleted Boolean      @default(false)
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
+  createdAt           DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime     @updatedAt @db.Timestamptz(3)
 
   // Auth relations
   refreshTokens       RefreshToken[]
@@ -131,9 +165,9 @@ model RefreshToken {
   id        String    @id @default(uuid(7)) @db.Uuid
   userId    String    @db.Uuid
   tokenHash String    @unique
-  expiresAt DateTime
-  revokedAt DateTime?
-  createdAt DateTime  @default(now())
+  expiresAt DateTime  @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -142,21 +176,23 @@ model RefreshToken {
 }
 
 model OnboardingResponse {
-  id                     String    @id @default(uuid(7)) @db.Uuid
-  userId                 String    @unique @db.Uuid
-  workMode               WorkMode
-  workStyle              WorkStyle
-  wellnessGoals          String[]
-  breakPreference        String
-  notificationPreference String
-  workingDays            String[]
-  workStartTime          String
-  workEndTime            String
-  timezone               String
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
+  id                 String         @id @default(uuid(7)) @db.Uuid
+  userId             String         @unique @db.Uuid
+  workMode           WorkMode
+  workStartTime      String         @db.VarChar(5)
+  workEndTime        String         @db.VarChar(5)
+  workingDays        Weekday[]
+  timezone           String
+  workStyle          WorkStyle
+  wellnessGoals      WellnessGoal[] @default([])
+  breakRhythm        BreakRhythm
+  customFocusMinutes Int?
+  customBreakMinutes Int?
+  reminderStyle      ReminderStyle
+  createdAt          DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime       @updatedAt @db.Timestamptz(3)
 
-  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("onboarding_responses")
 }
@@ -179,8 +215,8 @@ model UserPreference {
   soundEnabled              Boolean         @default(true)
   dailySummaryEnabled       Boolean         @default(false)
   theme                     ThemePreference @default(SYSTEM)
-  createdAt                 DateTime        @default(now())
-  updatedAt                 DateTime        @updatedAt
+  createdAt                 DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt                 DateTime        @updatedAt @db.Timestamptz(3)
 
   user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -190,12 +226,12 @@ model UserPreference {
 model DailyPlan {
   id                    String          @id @default(uuid(7)) @db.Uuid
   userId                String          @db.Uuid
-  planDate              DateTime
+  planDate              DateTime        @db.Date
   status                DailyPlanStatus @default(PLANNED)
   totalPlannedMinutes   Int             @default(0)
   totalCompletedMinutes Int             @default(0)
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @updatedAt
+  createdAt             DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime        @updatedAt @db.Timestamptz(3)
 
   user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   tasks                 Task[]
@@ -217,12 +253,12 @@ model Task {
   category         String?
   estimatedMinutes Int?
   actualMinutes    Int?
-  dueTime          DateTime?
+  dueTime          DateTime?      @db.Timestamptz(3)
   status           TaskStatus     @default(PENDING)
   sortOrder        Int            @default(0)
   useForAiPlanning Boolean        @default(true)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  createdAt        DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime       @updatedAt @db.Timestamptz(3)
 
   user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   dailyPlan        DailyPlan?     @relation(fields: [dailyPlanId], references: [id], onDelete: SetNull)
@@ -239,9 +275,9 @@ model FocusSession {
   userId                 String             @db.Uuid
   taskId                 String?            @db.Uuid
   dailyPlanId            String?            @db.Uuid
-  startedAt              DateTime           @default(now())
-  endedAt                DateTime?
-  pausedAt               DateTime?
+  startedAt              DateTime           @default(now()) @db.Timestamptz(3)
+  endedAt                DateTime?          @db.Timestamptz(3)
+  pausedAt               DateTime?          @db.Timestamptz(3)
   totalPausedSeconds     Int                @default(0)
   plannedDurationMinutes Int
   actualDurationMinutes  Int?
@@ -249,8 +285,8 @@ model FocusSession {
   moodBefore             String?
   moodAfter              String?
   distractionCount       Int                @default(0)
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
+  createdAt              DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime           @updatedAt @db.Timestamptz(3)
 
   user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   task                   Task?              @relation(fields: [taskId], references: [id], onDelete: SetNull)
@@ -269,14 +305,14 @@ model BreakSession {
   userId                 String             @db.Uuid
   focusSessionId         String?            @db.Uuid
   breakType              BreakType
-  startedAt              DateTime?
-  endedAt                DateTime?
+  startedAt              DateTime?          @db.Timestamptz(3)
+  endedAt                DateTime?          @db.Timestamptz(3)
   plannedDurationMinutes Int
   actualDurationMinutes  Int?
   status                 BreakSessionStatus @default(SCHEDULED)
   suggestion             String?
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
+  createdAt              DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime           @updatedAt @db.Timestamptz(3)
 
   user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   focusSession           FocusSession?      @relation(fields: [focusSessionId], references: [id], onDelete: SetNull)
@@ -293,12 +329,12 @@ model Notification {
   type        NotificationType
   title       String
   message     String
-  scheduledAt DateTime?
-  sentAt      DateTime?
-  readAt      DateTime?
+  scheduledAt DateTime?          @db.Timestamptz(3)
+  sentAt      DateTime?          @db.Timestamptz(3)
+  readAt      DateTime?          @db.Timestamptz(3)
   status      NotificationStatus @default(UNREAD)
   metadata    Json?
-  createdAt   DateTime           @default(now())
+  createdAt   DateTime           @default(now()) @db.Timestamptz(3)
 
   user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -311,7 +347,7 @@ model Notification {
 model DailyAnalytics {
   id                         String   @id @default(uuid(7)) @db.Uuid
   userId                     String   @db.Uuid
-  date                       DateTime
+  date                       DateTime @db.Date
   totalFocusMinutes          Int      @default(0)
   totalBreakMinutes          Int      @default(0)
   tasksCompleted             Int      @default(0)
@@ -321,8 +357,8 @@ model DailyAnalytics {
   averageFocusSessionMinutes Int      @default(0)
   productivityScore          Int      @default(0)
   breakHealthScore           Int      @default(0)
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
+  createdAt                  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt                  DateTime @updatedAt @db.Timestamptz(3)
 
   user                       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
