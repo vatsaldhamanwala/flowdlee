@@ -62,6 +62,11 @@ enum Weekday {
   SUN
 }
 
+enum UserPreferenceSource {
+  RECOMMENDED
+  USER
+}
+
 enum TaskPriority {
   LOW
   MEDIUM
@@ -198,27 +203,41 @@ model OnboardingResponse {
 }
 
 model UserPreference {
-  id                        String          @id @default(uuid(7)) @db.Uuid
-  userId                    String          @unique @db.Uuid
-  workMode                  WorkMode
-  workStartTime             String
-  workEndTime               String
-  workingDays               String[]
-  timezone                  String
-  focusDurationMinutes      Int             @default(50)
-  shortBreakDurationMinutes Int             @default(10)
-  longBreakDurationMinutes  Int             @default(20)
-  longBreakAfterSessions    Int             @default(4)
-  eyeRestIntervalMinutes    Int             @default(25)
-  stretchIntervalMinutes    Int             @default(90)
-  notificationType          String
-  soundEnabled              Boolean         @default(true)
-  dailySummaryEnabled       Boolean         @default(false)
-  theme                     ThemePreference @default(SYSTEM)
-  createdAt                 DateTime        @default(now()) @db.Timestamptz(3)
-  updatedAt                 DateTime        @updatedAt @db.Timestamptz(3)
+  id                        String           @id @default(uuid(7)) @db.Uuid
+  userId                    String           @unique @db.Uuid
 
-  user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Work rhythm (the live copy, editable in Settings)
+  workMode                  WorkMode
+  workStartTime             String           @db.VarChar(5)
+  workEndTime               String           @db.VarChar(5)
+  workingDays               Weekday[]
+  timezone                  String
+
+  // Focus and breaks
+  breakRhythm               BreakRhythm      @default(SMART)
+  focusDurationMinutes      Int              @default(50)
+  shortBreakDurationMinutes Int              @default(10)
+  longBreakDurationMinutes  Int              @default(20)
+  longBreakAfterSessions    Int              @default(4)
+
+  // Wellness reminders (null = switched off)
+  eyeRestIntervalMinutes    Int?             @default(25)
+  stretchIntervalMinutes    Int?             @default(90)
+
+  // Notifications
+  reminderStyle             ReminderStyle
+  dailySummaryEnabled       Boolean          @default(false)
+
+  // Appearance
+  theme                     ThemePreference  @default(SYSTEM)
+
+  // Who set these numbers: the recommendation rules or the user
+  source                    UserPreferenceSource @default(RECOMMENDED)
+
+  createdAt                 DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt                 DateTime         @updatedAt @db.Timestamptz(3)
+
+  user                      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_preferences")
 }
