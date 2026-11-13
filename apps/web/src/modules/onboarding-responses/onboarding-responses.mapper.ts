@@ -14,7 +14,7 @@ export function toOnboardingResponseDTO(onboardingResponse: OnboardingResponse):
     customFocusMinutes: onboardingResponse.customFocusMinutes,
     customBreakMinutes: onboardingResponse.customBreakMinutes,
     reminderStyle: onboardingResponse.reminderStyle,
-    createdAt: onboardingResponse.createdAt,
-    updatedAt: onboardingResponse.updatedAt,
+    createdAt: onboardingResponse.createdAt.toISOString(),
+    updatedAt: onboardingResponse.updatedAt.toISOString(),
   };
 }
