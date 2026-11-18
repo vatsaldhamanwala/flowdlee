@@ -33,6 +33,13 @@ export const TOKEN = {
 };
 
 export const ONBOARDING_RESPONSE = {
-  FETCHED: 'Onboarding answers fetched successfully.',
-  SAVED: 'Onboarding answers saved successfully.',
+  FETCHED: 'User Onboarding answers fetched successfully.',
+  SAVED: 'User Onboarding answers saved successfully.',
+};
+
+export const USER_PREFERENCES = {
+  FETCHED: 'User preferences fetched successfully.',
+  UPDATED: 'User preferences updated successfully.',
+  RESET: 'User preferences reset to recommended.',
+  NOT_FOUND: 'User preferences not found. Please complete onboarding first.',
 };

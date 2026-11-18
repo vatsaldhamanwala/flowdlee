@@ -2,7 +2,10 @@ import { OnboardingResponse, WorkMode } from '@/generated/prisma';
 import { Weekday, WorkStyle, WellnessGoal, BreakRhythm, ReminderStyle } from '@/generated/prisma';
 
 // omitting id and userId because it already knows who the logged-in user is
-export type OnboardingResponseDTO = Omit<OnboardingResponse, 'id' | 'userId'>;
+export type OnboardingResponseDTO = Omit<OnboardingResponse, 'id' | 'userId' | 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
+};
 
 // upsert onboarding responses
 // What the repository needs to save onboarding answers
