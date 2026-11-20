@@ -1,8 +1,8 @@
-import { PrismaClient } from '@/generated/prisma';
 import { CreateUserInputDTO, UpdateUserInputDTO } from './dto/user.dto';
+import { DbClient } from '@/server/db/prisma';
 
 export class UserRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: DbClient) {}
 
   // create new user
   async createUser(data: CreateUserInputDTO) {
@@ -36,6 +36,14 @@ export class UserRepository {
         id,
       },
       data,
+    });
+  }
+
+  // mark onboarding response as -> true
+  async markOnboardingCompleted(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { onboardingCompleted: true },
     });
   }
 }

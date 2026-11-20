@@ -1,8 +1,8 @@
-import { PrismaClient } from '@/generated/prisma';
 import { UpdateUserPreferenceInputDTO, UpsertUserPreferenceInputDTO } from './dto/user-preferences.dto';
+import { DbClient } from '@/server/db/prisma';
 
 export class UserPreferenceRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: DbClient) {}
 
   // find user preference -> null if user have not onboarded yet
   async findUserById(userId: string) {

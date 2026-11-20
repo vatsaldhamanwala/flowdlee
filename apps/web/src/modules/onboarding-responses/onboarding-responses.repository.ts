@@ -1,8 +1,8 @@
-import { PrismaClient } from '@/generated/prisma';
 import { UpsertOnboardingResponseInputDTO } from './dto/onboarding-responses.dto';
+import { DbClient } from '@/server/db/prisma';
 
 export class OnboardingResponsesRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: DbClient) {}
 
   // find the user's answers (null if they haven't onboarded yet)
   async findByUserId(userId: string) {
