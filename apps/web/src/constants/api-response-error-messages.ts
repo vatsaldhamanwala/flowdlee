@@ -35,6 +35,7 @@ export const TOKEN = {
 export const ONBOARDING_RESPONSE = {
   FETCHED: 'User Onboarding answers fetched successfully.',
   SAVED: 'User Onboarding answers saved successfully.',
+  SUBMITTED: 'Onboarding completed. Your workday rhythm is ready.',
 };
 
 export const USER_PREFERENCES = {

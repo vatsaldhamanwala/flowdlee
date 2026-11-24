@@ -4,7 +4,7 @@ import { OnboardingResponseService } from './onboarding-responses.service';
 
 const onboardingRepository = new OnboardingResponsesRepository(prisma);
 
-const onboardingService = new OnboardingResponseService(onboardingRepository);
+const onboardingService = new OnboardingResponseService(onboardingRepository, prisma);
 
 export { onboardingService };
 
