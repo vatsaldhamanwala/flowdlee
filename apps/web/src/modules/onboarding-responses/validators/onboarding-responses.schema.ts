@@ -1,21 +1,6 @@
 import { BreakRhythm, ReminderStyle, Weekday, WellnessGoal, WorkMode, WorkStyle } from '@/generated/prisma';
+import { isValidTimeZone, TIME_HH_MM, unique } from '@/server/helpers/validation-rules';
 import { z } from 'zod';
-
-// "09:00" OK, "9:00" not OK, "24:00" not OK
-const TIME_HH_MM = /^([01]\d|2[0-3]):[0-5]\d$/;
-
-// Intl throws if the timezone name doesn't exist (e.g. "Asia/Nowhere")
-function isValidTimeZone(timeZone: string) {
-  try {
-    new Intl.DateTimeFormat('en-US', { timeZone });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-// Removes duplicates: ["MON","MON","TUE"] -> ["MON","TUE"]
-const unique = <T>(items: T[]) => [...new Set(items)];
 
 export const onboardingResponsesSchema = z
   .object({
