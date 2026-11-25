@@ -1,6 +1,9 @@
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@/generated/prisma';
+import { Prisma, PrismaClient } from '@/generated/prisma';
 import { env } from '../config/env';
+
+// Either the normal client, or a client inside a transaction
+export type DbClient = PrismaClient | Prisma.TransactionClient;
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
